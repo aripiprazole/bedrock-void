@@ -1,8 +1,9 @@
-package com.gabrielleeg1.bedrockvoid.network
+package com.gabrielleeg1.bedrockvoid.protocol
 
-import com.gabrielleeg1.bedrockvoid.network.packets.InboundPacket
-import com.gabrielleeg1.bedrockvoid.network.packets.OutboundPacket
-import com.gabrielleeg1.bedrockvoid.network.utils.compress
+import com.gabrielleeg1.bedrockvoid.network.Packet
+import com.gabrielleeg1.bedrockvoid.protocol.packets.InboundPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
+import com.gabrielleeg1.bedrockvoid.protocol.utils.compress
 import com.nukkitx.network.raknet.RakNetServerSession
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufAllocator

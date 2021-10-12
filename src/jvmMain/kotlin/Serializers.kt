@@ -1,17 +1,17 @@
 package com.gabrielleeg1.bedrockvoid
 
-import com.gabrielleeg1.bedrockvoid.network.PacketDeserializer
-import com.gabrielleeg1.bedrockvoid.network.PacketDeserializerMap
-import com.gabrielleeg1.bedrockvoid.network.PacketSerializer
-import com.gabrielleeg1.bedrockvoid.network.PacketSerializerMap
-import com.gabrielleeg1.bedrockvoid.network.VarInt
-import com.gabrielleeg1.bedrockvoid.network.packets.inbound.InboundHandshakePacket
-import com.gabrielleeg1.bedrockvoid.network.packets.inbound.LoginPacket
-import com.gabrielleeg1.bedrockvoid.network.packets.inbound.ViolationWarningPacket
-import com.gabrielleeg1.bedrockvoid.network.packets.outbound.DisconnectPacket
-import com.gabrielleeg1.bedrockvoid.network.packets.outbound.OutboundHandshakePacket
-import com.gabrielleeg1.bedrockvoid.network.readVarInt
-import com.gabrielleeg1.bedrockvoid.network.writeVarInt
+import com.gabrielleeg1.bedrockvoid.protocol.PacketDeserializer
+import com.gabrielleeg1.bedrockvoid.protocol.PacketDeserializerMap
+import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializer
+import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializerMap
+import com.gabrielleeg1.bedrockvoid.protocol.VarInt
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.InboundHandshakePacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ViolationWarningPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.OutboundHandshakePacket
+import com.gabrielleeg1.bedrockvoid.protocol.readVarInt
+import com.gabrielleeg1.bedrockvoid.protocol.writeVarInt
 import io.netty.buffer.ByteBuf
 
 private fun ByteBuf.readLEString(): String {

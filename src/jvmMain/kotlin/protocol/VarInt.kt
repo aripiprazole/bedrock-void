@@ -1,4 +1,4 @@
-package com.gabrielleeg1.bedrockvoid.network
+package com.gabrielleeg1.bedrockvoid.protocol
 
 import io.netty.buffer.ByteBuf
 import kotlin.experimental.and

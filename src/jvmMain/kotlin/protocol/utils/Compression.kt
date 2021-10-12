@@ -1,4 +1,4 @@
-package com.gabrielleeg1.bedrockvoid.network.utils
+package com.gabrielleeg1.bedrockvoid.protocol.utils
 
 import com.nukkitx.natives.util.Natives
 import io.netty.buffer.ByteBuf

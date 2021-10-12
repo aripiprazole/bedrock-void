@@ -1,12 +1,12 @@
 package com.gabrielleeg1.bedrockvoid
 
-import com.gabrielleeg1.bedrockvoid.network.MinecraftSession
-import com.gabrielleeg1.bedrockvoid.network.packets.inbound.InboundHandshakePacket
-import com.gabrielleeg1.bedrockvoid.network.packets.inbound.LoginPacket
-import com.gabrielleeg1.bedrockvoid.network.packets.inbound.ViolationWarningPacket
-import com.gabrielleeg1.bedrockvoid.network.packets.outbound.DisconnectPacket
-import com.gabrielleeg1.bedrockvoid.network.packets.outbound.OutboundHandshakePacket
-import com.gabrielleeg1.bedrockvoid.network.utils.decompress
+import com.gabrielleeg1.bedrockvoid.protocol.MinecraftSession
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.InboundHandshakePacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ViolationWarningPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.OutboundHandshakePacket
+import com.gabrielleeg1.bedrockvoid.protocol.utils.decompress
 import com.nukkitx.network.raknet.EncapsulatedPacket
 import com.nukkitx.network.raknet.RakNetServer
 import com.nukkitx.network.raknet.RakNetServerListener

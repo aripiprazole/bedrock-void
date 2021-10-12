@@ -1,6 +1,6 @@
-package com.gabrielleeg1.bedrockvoid.network
+package com.gabrielleeg1.bedrockvoid.protocol
 
-import com.gabrielleeg1.bedrockvoid.network.packets.OutboundPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
 import io.netty.buffer.ByteBuf
 
 typealias PacketSerializerMap = Map<Int, PacketSerializer<OutboundPacket>>
