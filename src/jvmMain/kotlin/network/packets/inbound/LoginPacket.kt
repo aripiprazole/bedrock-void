@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Packet(0x01)
 @Serializable
 data class LoginPacket(
-    val protocolVersion: Int,
-    val chainData: String,
-    val skinData: String
+  val protocolVersion: Int,
+  val chainData: String,
+  val skinData: String
 ) : InboundPacket

@@ -6,5 +6,5 @@ import io.netty.buffer.ByteBuf
 typealias PacketSerializerMap = Map<Int, PacketSerializer<OutboundPacket>>
 
 fun interface PacketSerializer<T> {
-    fun ByteBuf.serialize(value: T)
+  fun ByteBuf.serialize(value: T)
 }
