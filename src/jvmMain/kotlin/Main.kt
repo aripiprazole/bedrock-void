@@ -42,6 +42,7 @@ val motd = BedrockMotd(
 )
 
 @ExperimentalStdlibApi
+@Suppress("TooGenericExceptionCaught")
 suspend fun main(): Unit = withContext(ctx) {
   println("main => Create server")
 
@@ -68,7 +69,6 @@ suspend fun main(): Unit = withContext(ctx) {
               println("    =>> Protocol version: ${packet.protocolVersion}")
 
               try {
-                // TODO: authenticate
                 session.sendPacket(OutboundHandshakePacket("TODO"))
               } catch (throwable: Throwable) {
                 throwable.printStackTrace()
@@ -123,6 +123,7 @@ suspend fun main(): Unit = withContext(ctx) {
       }
 
       override fun onUnhandledDatagram(ctx: ChannelHandlerContext, packet: DatagramPacket) {
+        // 
       }
     }
   }

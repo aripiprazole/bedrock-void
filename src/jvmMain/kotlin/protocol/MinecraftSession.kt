@@ -1,6 +1,5 @@
 package com.gabrielleeg1.bedrockvoid.protocol
 
-import com.gabrielleeg1.bedrockvoid.network.Packet
 import com.gabrielleeg1.bedrockvoid.protocol.packets.InboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.utils.compress

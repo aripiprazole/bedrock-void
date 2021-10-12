@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.gabrielleeg1.bedrockvoid
 
 import com.gabrielleeg1.bedrockvoid.protocol.PacketDeserializer
@@ -63,13 +65,11 @@ private object OutboundHandshakePacketSerializer : PacketSerializer<OutboundHand
   }
 }
 
-@Suppress("UNCHECKED_CAST")
 val serializers = mapOf(
   0x03 to OutboundHandshakePacketSerializer,
   0x05 to DisconnectPacketSerializer,
 ) as PacketSerializerMap
 
-@Suppress("UNCHECKED_CAST")
 val deserializers = mapOf(
   0x01 to LoginPacketDeserializer,
   0x04 to InboundHandshakePacketDeserializer,
