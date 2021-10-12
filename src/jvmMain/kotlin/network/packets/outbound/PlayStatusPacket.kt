@@ -1,0 +1,20 @@
+package com.gabrielleeg1.bedrockvoid.network.packets.outbound
+
+import com.gabrielleeg1.bedrockvoid.network.Packet
+import com.gabrielleeg1.bedrockvoid.network.packets.OutboundPacket
+import kotlinx.serialization.Serializable
+
+@Packet(0x02)
+@Serializable
+data class PlayStatusPacket(val status: Status) : OutboundPacket {
+    enum class Status {
+        LoginSuccess,
+        FailedClient,
+        FailedServer,
+        PlayerSpawn,
+        FailedInvalidTenant,
+        FailedVanillaEdu,
+        FailedEduVanilla,
+        FailedServerFull;
+    }
+}
