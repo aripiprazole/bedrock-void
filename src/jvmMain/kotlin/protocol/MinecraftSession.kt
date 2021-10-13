@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import mu.KLogging
+import java.net.InetSocketAddress
 import kotlin.reflect.full.findAnnotation
 
 class MinecraftSession(
@@ -18,6 +19,8 @@ class MinecraftSession(
   private val serializers: PacketSerializerMap,
   private val deserializers: PacketDeserializerMap,
 ) {
+  val address: InetSocketAddress by session::address
+
   private val _inboundPacketFlow = MutableStateFlow<InboundPacket?>(null)
   val inboundPacketFlow: Flow<InboundPacket>
     get() = _inboundPacketFlow.filterNotNull()

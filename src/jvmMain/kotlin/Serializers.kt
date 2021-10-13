@@ -7,6 +7,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.PacketDeserializerMap
 import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializer
 import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializerMap
 import com.gabrielleeg1.bedrockvoid.protocol.VarInt
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ClientCacheStatusPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.InboundHandshakePacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket.JwtData
@@ -61,6 +62,12 @@ private object LoginPacketDeserializer : PacketDeserializer<LoginPacket> {
     val skinData = jwt.readLEString()
 
     return LoginPacket(protocolVersion, chainData, skinData)
+  }
+}
+
+private object ClientCacheStatusPacketSerializer : PacketDeserializer<ClientCacheStatusPacket> {
+  override fun ByteBuf.deserialize(): ClientCacheStatusPacket {
+    return ClientCacheStatusPacket(readBoolean())
   }
 }
 

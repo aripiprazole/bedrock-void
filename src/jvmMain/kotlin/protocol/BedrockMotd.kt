@@ -1,4 +1,4 @@
-package com.gabrielleeg1.bedrockvoid
+package com.gabrielleeg1.bedrockvoid.protocol
 
 data class BedrockMotd(
   val edition: String,
