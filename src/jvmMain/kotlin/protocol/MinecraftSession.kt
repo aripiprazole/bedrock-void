@@ -3,6 +3,9 @@ package com.gabrielleeg1.bedrockvoid.protocol
 import com.gabrielleeg1.bedrockvoid.protocol.packets.InboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
+import com.gabrielleeg1.bedrockvoid.protocol.types.VarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.readVarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarInt
 import com.gabrielleeg1.bedrockvoid.protocol.utils.compress
 import com.nukkitx.network.raknet.RakNetServerSession
 import io.netty.buffer.ByteBuf

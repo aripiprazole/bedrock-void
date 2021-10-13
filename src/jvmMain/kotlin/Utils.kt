@@ -1,8 +1,8 @@
 package com.gabrielleeg1.bedrockvoid
 
-import com.gabrielleeg1.bedrockvoid.protocol.VarInt
-import com.gabrielleeg1.bedrockvoid.protocol.readVarInt
-import com.gabrielleeg1.bedrockvoid.protocol.writeVarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.VarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.readVarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarInt
 import io.netty.buffer.ByteBuf
 
 // String

@@ -6,7 +6,6 @@ import com.gabrielleeg1.bedrockvoid.protocol.PacketDeserializer
 import com.gabrielleeg1.bedrockvoid.protocol.PacketDeserializerMap
 import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializer
 import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializerMap
-import com.gabrielleeg1.bedrockvoid.protocol.VarInt
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ClientCacheStatusPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.InboundHandshakePacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
@@ -20,8 +19,9 @@ import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePackStackPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePackStackPacket.ResourcePack
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksInfoPacket
-import com.gabrielleeg1.bedrockvoid.protocol.readVarInt
-import com.gabrielleeg1.bedrockvoid.protocol.writeVarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.VarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.readVarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarInt
 import io.netty.buffer.ByteBuf
 import kotlinx.serialization.decodeFromString
 import java.util.Base64

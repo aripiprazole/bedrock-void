@@ -1,9 +1,13 @@
-package com.gabrielleeg1.bedrockvoid.protocol
+package com.gabrielleeg1.bedrockvoid.protocol.types
 
+import com.gabrielleeg1.bedrockvoid.protocol.PacketDeserializer
+import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializer
 import io.netty.buffer.ByteBuf
+import kotlinx.serialization.Serializable
 import kotlin.experimental.and
 
 @JvmInline
+@Serializable
 value class VarInt(val value: Int) {
   override fun toString(): String = "VarInt(value=0x${Integer.toHexString(value)})"
 
