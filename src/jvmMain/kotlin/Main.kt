@@ -1,11 +1,11 @@
 package com.gabrielleeg1.bedrockvoid
 
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftSession
-import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.InboundHandshakePacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ViolationWarningPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
-import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.OutboundHandshakePacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket.Status
 import com.gabrielleeg1.bedrockvoid.protocol.utils.decompress
 import com.nukkitx.network.raknet.EncapsulatedPacket
 import com.nukkitx.network.raknet.RakNetServer
@@ -25,9 +25,14 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors
+
+val json = Json {
+  ignoreUnknownKeys = true
+}
 
 val ctx = CoroutineName("bedrock-void") +
   Executors.newFixedThreadPool(2).asCoroutineDispatcher()
@@ -69,17 +74,18 @@ suspend fun main(): Unit = withContext(ctx) {
         session.inboundPacketFlow.onEach { packet ->
           when (packet) {
             is LoginPacket -> {
-              logger.info {
-                "Player logging-in with protocol version ${packet.protocolVersion} from [${connection.address}]"
-              }
+              val (_, _, displayName) = packet.chainData.chain.third.extraData
 
               try {
-                session.sendPacket(OutboundHandshakePacket("TODO"))
-              } catch (throwable: Throwable) {
-                throwable.printStackTrace()
+                logger.info {
+                  "Player $displayName with protocol [${packet.protocolVersion}] connected from [${connection.address}]"
+                }
+
+                session.sendPacket(PlayStatusPacket(Status.LoginSuccess))
+                session.sendPacket(DisconnectPacket(kickMessage = "Successfully logged in!"))
+              } catch (error: Throwable) {
+                error.printStackTrace()
               }
-            }
-            is InboundHandshakePacket -> {
             }
             is ViolationWarningPacket -> {
               logger.warn { "Packet violation" }
@@ -92,8 +98,6 @@ suspend fun main(): Unit = withContext(ctx) {
         connection.listener = object : RakNetSessionListener {
           override fun onSessionChangeState(state: RakNetState) {
             if (state != RakNetState.CONNECTED) return
-
-            logger.info { "Session connected from [${connection.address}]" }
 
             sessions.add(session)
           }
@@ -115,7 +119,9 @@ suspend fun main(): Unit = withContext(ctx) {
             try {
               session.onPacketReceived(buffer.decompress())
             } catch (error: Throwable) {
-              error.printStackTrace()
+              logger.error(error) { "Failed to read game packet" }
+              session.sendPacket(PlayStatusPacket(Status.LoginSuccess))
+              session.sendPacket(DisconnectPacket(kickMessage = "Failed to read game packet"))
             }
           }
 
