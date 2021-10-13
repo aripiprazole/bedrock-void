@@ -1,24 +1,12 @@
 package com.gabrielleeg1.bedrockvoid.protocol.types
 
-import com.gabrielleeg1.bedrockvoid.protocol.PacketDeserializer
-import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializer
 import io.netty.buffer.ByteBuf
-import kotlinx.serialization.Serializable
 import kotlin.experimental.and
 
-@JvmInline
-@Serializable
-value class VarInt(val value: Int) {
-  override fun toString(): String = "VarInt(value=0x${Integer.toHexString(value)})"
-
-  companion object Adapter : PacketDeserializer<VarInt>, PacketSerializer<VarInt> {
-    override fun ByteBuf.deserialize(): VarInt = readVarInt()
-    override fun ByteBuf.serialize(value: VarInt) = writeVarInt(value)
-  }
-}
+typealias VarInt = Int
 
 fun ByteBuf.writeVarInt(varInt: VarInt) {
-  var value = varInt.value
+  var value = varInt
 
   while (true) {
     if ((value and 0xFFFFFF80.toInt()) == 0) {
@@ -45,5 +33,5 @@ fun ByteBuf.readVarInt(): VarInt {
     offset += 7
   } while ((byte and 0x80.toByte()) != 0.toByte())
 
-  return VarInt(value.toInt())
+  return value.toInt()
 }

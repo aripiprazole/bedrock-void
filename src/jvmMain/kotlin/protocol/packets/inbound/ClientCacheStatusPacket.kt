@@ -6,6 +6,4 @@ import kotlinx.serialization.Serializable
 
 @Packet(0x01)
 @Serializable
-data class ClientCacheStatusPacket(
-  val supported: Boolean,
-) : InboundPacket
+data class ClientCacheStatusPacket(val supported: Boolean) : InboundPacket

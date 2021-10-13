@@ -1,23 +1,19 @@
 package com.gabrielleeg1.bedrockvoid
 
-import com.gabrielleeg1.bedrockvoid.protocol.types.VarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.readVarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarInt
 import io.netty.buffer.ByteBuf
 
 // String
 fun ByteBuf.writeString(value: String) {
-  writeVarInt(VarInt(value.length))
+  writeVarInt(value.length)
   writeBytes(value.toByteArray())
 }
 
 fun ByteBuf.readString(): String {
-  val length = readVarInt()
-  val bytes = ByteArray(length.value)
-
-  readBytes(bytes)
-
-  return bytes.decodeToString()
+  return ByteArray(readVarInt())
+    .also(::readBytes)
+    .decodeToString()
 }
 
 fun ByteBuf.writeLEString(value: String) {
@@ -26,12 +22,9 @@ fun ByteBuf.writeLEString(value: String) {
 }
 
 fun ByteBuf.readLEString(): String {
-  val length = readIntLE()
-  val data = ByteArray(length)
-
-  readBytes(data)
-
-  return data.decodeToString()
+  return ByteArray(readIntLE())
+    .also(::readBytes)
+    .decodeToString()
 }
 
 // Array Short LE
@@ -64,14 +57,15 @@ fun <T> ByteBuf.writeArrayIntLE(array: Collection<T>, write: ByteBuf.(T) -> Unit
 
 // Array
 fun <T> ByteBuf.readArray(read: ByteBuf.() -> T): List<T> {
-  val length = readVarInt()
-
-  return (1..length.value).map { read() }
+  return (1..readVarInt()).map { read() }
 }
 
 fun <T> ByteBuf.writeArray(array: Collection<T>, write: ByteBuf.(T) -> Unit) {
-  writeVarInt(VarInt(array.size))
+  writeVarInt(array.size)
   array.forEach {
     write(it)
   }
 }
+
+// Hex
+fun Int.toHexString(): String = toUInt().toString(16)

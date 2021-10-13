@@ -2,7 +2,10 @@ package com.gabrielleeg1.bedrockvoid.protocol.packets.outbound
 
 import com.gabrielleeg1.bedrockvoid.protocol.Packet
 import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
+import com.gabrielleeg1.bedrockvoid.protocol.types.BlockEntry
 import com.gabrielleeg1.bedrockvoid.protocol.types.BlockPos
+import com.gabrielleeg1.bedrockvoid.protocol.types.GameRule
+import com.gabrielleeg1.bedrockvoid.protocol.types.ItemEntry
 import com.gabrielleeg1.bedrockvoid.protocol.types.VarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.VarLong
 import com.gabrielleeg1.bedrockvoid.protocol.types.Vec2
@@ -63,33 +66,7 @@ data class StartGamePacket(
   val currentTick: Long,
   val enchantmentSeed: VarInt,
   val blocks: List<BlockEntry>,
-  val items: List<BlockEntry>,
+  val items: List<ItemEntry>,
   val multiplayerCorrelationId: String,
   val inventoriesServerAuthoritative: Boolean,
-) : OutboundPacket {
-  @Serializable
-  data class GameRule(
-    val name: String,
-    val canBeModifiedByPlayer: Boolean,
-    val value: Value,
-  ) {
-    @Serializable
-    sealed class Value
-
-    data class BooleanValue(val boolean: Boolean) : Value()
-    data class IntValue(val int: Int) : Value()
-    data class FloatValue(val float: Float) : Value()
-  }
-
-  @Serializable
-  data class BlockEntry(
-    val name: String,
-  ) // add nbt
-
-  @Serializable
-  data class ItemEntry(
-    val name: String,
-    val runtimeId: Short,
-    val componentBased: Boolean,
-  )
-}
+) : OutboundPacket

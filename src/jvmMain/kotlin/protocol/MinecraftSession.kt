@@ -3,10 +3,10 @@ package com.gabrielleeg1.bedrockvoid.protocol
 import com.gabrielleeg1.bedrockvoid.protocol.packets.InboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
-import com.gabrielleeg1.bedrockvoid.protocol.types.VarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.readVarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarInt
 import com.gabrielleeg1.bedrockvoid.protocol.utils.compress
+import com.gabrielleeg1.bedrockvoid.toHexString
 import com.nukkitx.network.raknet.RakNetServerSession
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufAllocator
@@ -32,7 +32,7 @@ class MinecraftSession(
   suspend fun onPacketReceived(buf: ByteBuf) {
     while (buf.isReadable) {
       val length = buf.readVarInt()
-      val packetBuffer = buf.readSlice(length.value)
+      val packetBuffer = buf.readSlice(length)
 
       if (!packetBuffer.isReadable) {
         error("Could not read packet")
@@ -40,8 +40,8 @@ class MinecraftSession(
 
       val packetId = packetBuffer.readVarInt()
 
-      val deserializer = deserializers[packetId.value]
-        ?.also { logger.debug { "Reading packet with id [$packetId] and deserializer [$it]" } }
+      val deserializer = deserializers[packetId]
+        ?.also { logger.debug { "Reading packet with id [${packetId.toHexString()}] and deserializer [$it]" } }
         ?: error("Packet $packetId does not have a deserializer")
 
       deserializer.run {
@@ -70,7 +70,7 @@ class MinecraftSession(
 
       serializers[packetId]
         ?.run {
-          logger.debug { "Sending packet with id ${VarInt(packetId)} and serializer $this" }
+          logger.debug { "Sending packet with id ${packetId.toHexString()} and serializer $this" }
 
           val head = (
             0 or (packetId and 0x3ff)
@@ -78,12 +78,12 @@ class MinecraftSession(
               or ((0 and 3) shl 12)
             )
 
-          packetBuf.writeVarInt(VarInt(head))
+          packetBuf.writeVarInt(head)
           packetBuf.serialize(packet)
         }
         ?: error("Packet ${packet::class.simpleName} does not have a serializer")
 
-      uncompressed.writeVarInt(VarInt(packetBuf.readableBytes()))
+      uncompressed.writeVarInt(packetBuf.readableBytes())
       uncompressed.writeBytes(packetBuf)
     }
 

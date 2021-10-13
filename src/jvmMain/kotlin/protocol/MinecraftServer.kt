@@ -4,7 +4,7 @@ package com.gabrielleeg1.bedrockvoid.protocol
 
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket
-import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket.Status
+import com.gabrielleeg1.bedrockvoid.protocol.types.PlayStatus.LoginSuccess
 import com.gabrielleeg1.bedrockvoid.protocol.utils.decompress
 import com.nukkitx.network.raknet.EncapsulatedPacket
 import com.nukkitx.network.raknet.RakNetServer
@@ -75,7 +75,7 @@ class MinecraftServer(
                 session.onPacketReceived(buffer.decompress())
               } catch (error: Throwable) {
                 logger.error(error) { "Failed to read game packet" }
-                session.sendPacket(PlayStatusPacket(Status.LoginSuccess))
+                session.sendPacket(PlayStatusPacket(LoginSuccess))
                 session.sendPacket(DisconnectPacket(kickMessage = "Failed to read game packet"))
               }
             }

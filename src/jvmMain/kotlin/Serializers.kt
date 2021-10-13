@@ -9,17 +9,16 @@ import com.gabrielleeg1.bedrockvoid.protocol.PacketSerializerMap
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ClientCacheStatusPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.InboundHandshakePacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
-import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket.JwtData
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket
-import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket.Status
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ViolationWarningPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.OutboundHandshakePacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePackStackPacket
-import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePackStackPacket.ResourcePack
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksInfoPacket
-import com.gabrielleeg1.bedrockvoid.protocol.types.VarInt
+import com.gabrielleeg1.bedrockvoid.protocol.types.JwtData
+import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus
+import com.gabrielleeg1.bedrockvoid.protocol.types.StackResourcePack
 import com.gabrielleeg1.bedrockvoid.protocol.types.readVarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarInt
 import io.netty.buffer.ByteBuf
@@ -41,7 +40,7 @@ private object LoginPacketDeserializer : PacketDeserializer<LoginPacket> {
   override fun ByteBuf.deserialize(): LoginPacket {
     val protocolVersion = readInt()
 
-    val jwt = readSlice(readVarInt().value)
+    val jwt = readSlice(readVarInt())
 
     val chainData = json.decodeFromString<Map<String, List<String>>>(jwt.readLEString()).run {
       val (fst, snd, third) = get("chain") ?: error("'chain' does not exist in 'chainData'")
@@ -80,7 +79,7 @@ private object InboundHandshakePacketDeserializer : PacketDeserializer<InboundHa
 
 private object OutboundHandshakePacketSerializer : PacketSerializer<OutboundHandshakePacket> {
   override fun ByteBuf.serialize(value: OutboundHandshakePacket) {
-    writeVarInt(VarInt(value.jwtData.length))
+    writeVarInt(value.jwtData.length)
     writeBytes(value.jwtData.toByteArray())
   }
 }
@@ -121,7 +120,7 @@ private object ResourcePacksInfoPacketSerializer : PacketSerializer<ResourcePack
 private object ResourcePackResponsePacketDeserializer :
   PacketDeserializer<ResourcePackResponsePacket> {
   override fun ByteBuf.deserialize(): ResourcePackResponsePacket {
-    val status = Status.values()[readUnsignedByte().toInt()]
+    val status = ResourcePackResponseStatus.values()[readUnsignedByte().toInt()]
     val ids = readArrayShortLE { readString() }
 
     return ResourcePackResponsePacket(status, ids)
@@ -129,7 +128,7 @@ private object ResourcePackResponsePacketDeserializer :
 }
 
 private object ResourcePackStackPacketSerializer : PacketSerializer<ResourcePackStackPacket> {
-  private fun ByteBuf.writeResourcePack(pack: ResourcePack) {
+  private fun ByteBuf.writeResourcePack(pack: StackResourcePack) {
     writeString(pack.id)
     writeString(pack.version)
     writeString(pack.subPackName)
