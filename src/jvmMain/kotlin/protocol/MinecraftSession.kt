@@ -2,6 +2,7 @@ package com.gabrielleeg1.bedrockvoid.protocol
 
 import com.gabrielleeg1.bedrockvoid.protocol.packets.InboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
 import com.gabrielleeg1.bedrockvoid.protocol.utils.compress
 import com.nukkitx.network.raknet.RakNetServerSession
 import io.netty.buffer.ByteBuf
@@ -66,6 +67,8 @@ class MinecraftSession(
 
       serializers[packetId]
         ?.run {
+          logger.debug { "Sending packet with id ${VarInt(packetId)} and serializer $this" }
+
           val head = (
             0 or (packetId and 0x3ff)
               or ((0 and 3) shl 10)
@@ -88,6 +91,10 @@ class MinecraftSession(
     finalPayload.writeBytes(compressed)
 
     session.send(finalPayload)
+  }
+
+  suspend fun disconnect(message: String = "Disconnected") {
+    sendPacket(DisconnectPacket(kickMessage = message))
   }
 
   companion object : KLogging()

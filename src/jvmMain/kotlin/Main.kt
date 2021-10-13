@@ -6,13 +6,22 @@ import com.gabrielleeg1.bedrockvoid.protocol.BedrockMotd
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftServer
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftSession
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket.Status.Completed
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket.Status.HaveAllPacks
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket.Status.None
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket.Status.Refused
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket.Status.SendPackets
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ViolationWarningPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket
-import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket.Status
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket.Status.LoginSuccess
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePackStackPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksInfoPacket
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
@@ -36,13 +45,41 @@ private val motd = BedrockMotd(
   playerCount = 0,
   maxPlayerCount = 20,
   gameType = "Survival",
-  protocolVersion = 431,
+  protocolVersion = 465,
   version = "1.0"
 )
 
 private val logger = KotlinLogging.logger { }
 
-suspend fun onSessionCreated(session: MinecraftSession) {
+@ExperimentalStdlibApi
+suspend fun main(): Unit = withContext(ctx) {
+  logger.info { "Creating server..." }
+
+  val address = InetSocketAddress("0.0.0.0", 19132)
+  val server = MinecraftServer(address, motd, serializers, deserializers, ::onSessionCreated)
+
+  server.bind()
+}
+
+fun handleResourcePack(session: MinecraftSession) {
+  session.inboundPacketFlow.filterIsInstance<ResourcePackResponsePacket>().onEach { packet ->
+    when (packet.status) {
+      None -> session.disconnect("TODO: None")
+      Refused -> session.disconnect("TODO: Refused")
+      SendPackets -> session.disconnect("TODO: HaveAllPacks")
+      HaveAllPacks -> session.sendPacket(
+        ResourcePackStackPacket(
+          requireAccept = false,
+          gameVersion = "1.17.30",
+          experimentsPreviouslyToggled = false,
+        ),
+      )
+      Completed -> {}
+    }
+  }.launchIn(scope)
+}
+
+fun handleLogin(session: MinecraftSession) {
   session.inboundPacketFlow.onEach { packet ->
     when (packet) {
       is LoginPacket -> {
@@ -53,8 +90,15 @@ suspend fun onSessionCreated(session: MinecraftSession) {
             "Player $displayName with protocol [${packet.protocolVersion}] connected from [${session.address}]"
           }
 
-          session.sendPacket(PlayStatusPacket(Status.LoginSuccess))
-          session.sendPacket(DisconnectPacket(kickMessage = "Successfully logged in!"))
+          session.sendPacket(PlayStatusPacket(LoginSuccess))
+
+          session.sendPacket(
+            ResourcePacksInfoPacket(
+              requireAccept = false,
+              scriptingEnabled = false,
+              forcingServerPacksEnabled = false,
+            ),
+          )
         } catch (error: Throwable) {
           error.printStackTrace()
         }
@@ -68,12 +112,7 @@ suspend fun onSessionCreated(session: MinecraftSession) {
   }.launchIn(scope)
 }
 
-@ExperimentalStdlibApi
-suspend fun main(): Unit = withContext(ctx) {
-  logger.info { "Creating server..." }
-
-  val address = InetSocketAddress("0.0.0.0", 19132)
-  val server = MinecraftServer(address, motd, serializers, deserializers, ::onSessionCreated)
-
-  server.bind()
+fun onSessionCreated(session: MinecraftSession) {
+  handleLogin(session)
+  handleResourcePack(session)
 }
