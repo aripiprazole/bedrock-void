@@ -25,13 +25,14 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors
 
 val ctx = CoroutineName("bedrock-void") +
   Executors.newFixedThreadPool(2).asCoroutineDispatcher()
 
-val motd = BedrockMotd(
+private val motd = BedrockMotd(
   edition = "MCPE",
   motd = "My Server",
   playerCount = 0,
@@ -41,14 +42,17 @@ val motd = BedrockMotd(
   version = "1.0"
 )
 
+private val logger = KotlinLogging.logger { }
+
 @ExperimentalStdlibApi
 @Suppress("TooGenericExceptionCaught")
 suspend fun main(): Unit = withContext(ctx) {
-  println("main => Create server")
+  logger.info { "Creating server..." }
 
+  val address = InetSocketAddress("0.0.0.0", 19132)
   val sessions = hashSetOf<MinecraftSession>()
 
-  val server = RakNetServer(InetSocketAddress("0.0.0.0", 19132)).apply {
+  val server = RakNetServer(address).apply {
     protocolVersion = -1
 
     listener = object : RakNetServerListener {
@@ -65,22 +69,20 @@ suspend fun main(): Unit = withContext(ctx) {
         session.inboundPacketFlow.onEach { packet ->
           when (packet) {
             is LoginPacket -> {
-              println("=>> Login packet just come!")
-              println("    =>> Protocol version: ${packet.protocolVersion}")
+              logger.info {
+                "Player logging-in with protocol version ${packet.protocolVersion} from [${connection.address}]"
+              }
 
               try {
                 session.sendPacket(OutboundHandshakePacket("TODO"))
               } catch (throwable: Throwable) {
                 throwable.printStackTrace()
               }
-
-              println("=>> Outbound handshake sent!")
             }
             is InboundHandshakePacket -> {
-              println("=>> InboundHandshake just come!")
             }
             is ViolationWarningPacket -> {
-              println("=>> Packet violation")
+              logger.warn { "Packet violation" }
 
               session.sendPacket(DisconnectPacket(kickMessage = "Packet violation"))
             }
@@ -91,13 +93,14 @@ suspend fun main(): Unit = withContext(ctx) {
           override fun onSessionChangeState(state: RakNetState) {
             if (state != RakNetState.CONNECTED) return
 
-            println("RakNetSessionListener@onSessionChangeState => Login from ${connection.address}")
+            logger.info { "Session connected from [${connection.address}]" }
 
             sessions.add(session)
           }
 
           override fun onDisconnect(reason: DisconnectReason) {
-            println("RakNetSessionListener@onDisconnect => Disconnected ${connection.address}")
+            logger.info { "Session disconnected from [${connection.address}]" }
+
             sessions.remove(session)
           }
 
@@ -117,7 +120,7 @@ suspend fun main(): Unit = withContext(ctx) {
           }
 
           override fun onDirect(buf: ByteBuf) {
-            println("RakNetSessionListener@onDirect => $buf")
+            //
           }
         }
       }
@@ -128,7 +131,7 @@ suspend fun main(): Unit = withContext(ctx) {
     }
   }
 
-  println("main => Starting server")
+  logger.info { "Listening Minecraft Bedrock connections at [$address]..." }
 
   server.bind().await()
 }

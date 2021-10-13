@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
+import mu.KLogging
 import kotlin.reflect.full.findAnnotation
 
 class MinecraftSession(
@@ -27,15 +28,14 @@ class MinecraftSession(
       val packetBuffer = buf.readSlice(length.value)
 
       if (!packetBuffer.isReadable) {
-        error("ByteBuf@readPacketBatch => Could not read packet")
+        error("Could not read packet")
       }
 
       val packetId = packetBuffer.readVarInt()
-        .also { println("ByteBuf@readPacketBatch => Packet id: $it") }
 
       val deserializer = deserializers[packetId.value]
-        ?.also { println("ByteBuf@readPacketBatch => Packet deserializer: $it") }
-        ?: error("ByteBuf@readPacketBatch => Unknown packet deserializer for packet id: $packetId")
+        ?.also { logger.debug { "Reading packet with id [$packetId] and deserializer [$it]" } }
+        ?: error("Packet $packetId does not have a deserializer")
 
       deserializer.run {
         _inboundPacketFlow.emit(packetBuffer.deserialize())
@@ -86,4 +86,6 @@ class MinecraftSession(
 
     session.send(finalPayload)
   }
+
+  companion object : KLogging()
 }

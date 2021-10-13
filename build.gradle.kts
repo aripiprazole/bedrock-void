@@ -1,3 +1,5 @@
+@file:Suppress("UnusedPrivateMember")
+
 plugins {
   kotlin("multiplatform") version "1.5.10"
   kotlin("plugin.serialization") version "1.5.31"
@@ -55,6 +57,10 @@ kotlin {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2")
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+
+        implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
+        implementation("ch.qos.logback:logback-classic:1.2.1")
+        implementation("org.fusesource.jansi:jansi:1.18")
 
         implementation("com.nukkitx.network:query:1.6.28-SNAPSHOT")
         implementation("com.nukkitx.network:raknet:1.6.28-SNAPSHOT")
