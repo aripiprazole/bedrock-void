@@ -74,8 +74,8 @@ class MinecraftSession(
 
       packetBuf.writeVarInt( // write packet head
         0 or (id and 0x3ff)
-          or (3 shl 10)
-          or (3 shl 12)
+          or (0 shl 0xa)
+          or (0 shl 0xb)
       )
 
       @Suppress("UNCHECKED_CAST")

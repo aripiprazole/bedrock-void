@@ -36,4 +36,4 @@ fun ByteBuf.readVarInt(): VarInt {
   return value.toInt()
 }
 
-fun VarInt.toHexString(): String = Integer.toHexString(this)
+fun VarInt.toHexString(): String = "0x" + Integer.toHexString(this)
