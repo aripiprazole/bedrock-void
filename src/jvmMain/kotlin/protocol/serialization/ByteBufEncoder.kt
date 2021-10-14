@@ -28,6 +28,10 @@ class ByteBufEncoder(private val buf: ByteBuf, override val json: Json) : Packet
     buf.writeVarInt(value)
   }
 
+  override fun encodeVarUInt(value: UInt) {
+    encodeVarInt((value and 0xffffffff.toUInt()).toInt())
+  }
+
   override fun encodeIntLE(value: Int) {
     buf.writeIntLE(value)
   }
@@ -38,6 +42,10 @@ class ByteBufEncoder(private val buf: ByteBuf, override val json: Json) : Packet
 
   override fun encodeVarLong(value: Long) {
     buf.writeVarLong(value)
+  }
+
+  override fun encodeVarULong(value: ULong) {
+    buf.writeVarLong(value.toLong())
   }
 
   override fun encodeLongLE(value: Long) {
@@ -89,7 +97,7 @@ class ByteBufEncoder(private val buf: ByteBuf, override val json: Json) : Packet
   }
 
   override fun <T> encodeArray(array: Collection<T>, encode: PacketEncoder.(value: T) -> Unit) {
-    encodeVarInt(array.size)
+    encodeVarUInt(array.size.toUInt())
     array.forEach {
       encode(it)
     }

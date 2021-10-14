@@ -12,10 +12,12 @@ interface PacketEncoder {
 
   fun encodeInt(value: Int)
   fun encodeVarInt(value: Int)
+  fun encodeVarUInt(value: UInt)
   fun encodeIntLE(value: Int)
 
   fun encodeLong(value: Long)
   fun encodeVarLong(value: Long)
+  fun encodeVarULong(value: ULong)
   fun encodeLongLE(value: Long)
 
   fun encodeShort(value: Short)

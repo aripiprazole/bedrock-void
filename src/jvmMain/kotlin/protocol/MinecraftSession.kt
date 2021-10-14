@@ -45,7 +45,7 @@ class MinecraftSession(
       val packetId = packetBuf.readVarInt()
       val decoder = ByteBufDecoder(packetBuf, codec.json)
       val decodingStrategy = codec.inboundPackets[packetId]
-        ?: error("Packet $packetId does not have a deserializer")
+        ?: error("Packet ${packetId.toHexString()} does not have a deserializer")
 
       logger.debug {
         "Reading packet with id [${packetId.toHexString()}] and decoder [$decodingStrategy]"
@@ -80,7 +80,7 @@ class MinecraftSession(
 
       @Suppress("UNCHECKED_CAST")
       val encodingStrategy = codec.outboundPackets[id] as? EncodingStrategy<OutboundPacket>
-        ?: error("Packet ${packet::class.simpleName} does not have a serializer")
+        ?: error("Packet ${packet::class.simpleName} does not have an encoder")
 
       logger.debug {
         "Sending packet with id ${id.toHexString()} and encoding strategy $encodingStrategy"
