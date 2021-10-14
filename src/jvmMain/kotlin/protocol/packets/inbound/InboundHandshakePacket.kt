@@ -1,9 +1,7 @@
 package com.gabrielleeg1.bedrockvoid.protocol.packets.inbound
 
-import com.gabrielleeg1.bedrockvoid.protocol.Packet
 import com.gabrielleeg1.bedrockvoid.protocol.packets.InboundPacket
-import kotlinx.serialization.Serializable
+import com.gabrielleeg1.bedrockvoid.protocol.packets.Packet
 
 @Packet(0x04)
-@Serializable
 class InboundHandshakePacket : InboundPacket

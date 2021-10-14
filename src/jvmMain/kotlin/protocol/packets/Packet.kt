@@ -1,4 +1,4 @@
-package com.gabrielleeg1.bedrockvoid.protocol
+package com.gabrielleeg1.bedrockvoid.protocol.packets
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)

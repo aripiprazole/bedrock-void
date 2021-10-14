@@ -1,7 +1,7 @@
 package com.gabrielleeg1.bedrockvoid.protocol.packets.outbound
 
-import com.gabrielleeg1.bedrockvoid.protocol.Packet
 import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.Packet
 import com.gabrielleeg1.bedrockvoid.protocol.types.BlockEntry
 import com.gabrielleeg1.bedrockvoid.protocol.types.BlockPos
 import com.gabrielleeg1.bedrockvoid.protocol.types.GameRule
@@ -10,10 +10,8 @@ import com.gabrielleeg1.bedrockvoid.protocol.types.VarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.VarLong
 import com.gabrielleeg1.bedrockvoid.protocol.types.Vec2
 import com.gabrielleeg1.bedrockvoid.protocol.types.Vec3
-import kotlinx.serialization.Serializable
 
 @Packet(0x0B)
-@Serializable
 data class StartGamePacket(
   val entityId: VarLong,
   val runtimeEntityId: VarLong,

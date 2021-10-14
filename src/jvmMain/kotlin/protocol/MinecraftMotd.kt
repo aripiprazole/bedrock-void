@@ -1,6 +1,6 @@
 package com.gabrielleeg1.bedrockvoid.protocol
 
-data class BedrockMotd(
+data class MinecraftMotd(
   val edition: String,
   val gameType: String,
   val protocolVersion: Int = -1,

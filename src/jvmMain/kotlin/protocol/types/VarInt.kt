@@ -5,13 +5,13 @@ import kotlin.experimental.and
 
 typealias VarInt = Int
 
-fun ByteBuf.writeVarInt(varInt: VarInt) {
+fun ByteBuf.writeVarInt(varInt: VarInt): ByteBuf {
   var value = varInt
 
   while (true) {
     if ((value and 0xFFFFFF80.toInt()) == 0) {
       writeByte(value)
-      return
+      return this
     }
 
     writeByte((value and 0x7F) or 0x80)
@@ -35,3 +35,5 @@ fun ByteBuf.readVarInt(): VarInt {
 
   return value.toInt()
 }
+
+fun VarInt.toHexString(): String = Integer.toHexString(this)

@@ -2,7 +2,7 @@
 
 package com.gabrielleeg1.bedrockvoid
 
-import com.gabrielleeg1.bedrockvoid.protocol.BedrockMotd
+import com.gabrielleeg1.bedrockvoid.protocol.MinecraftMotd
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftServer
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftSession
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
@@ -10,8 +10,20 @@ import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackRespons
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ViolationWarningPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket
-import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePackStackPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksInfoPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksStackPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.utils.withPacketId
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketCodec
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.ClientCacheStatusPacketDecoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.InboundHandshakePacketDecoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.LoginPacketDecoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.ResourcePackResponsePacketDecoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.ViolationWarningPacketDecoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.DisconnectPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.OutboundHandshakePacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.PlayStatusPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.ResourcePacksInfoPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.ResourcePacksStackPacketEncoder
 import com.gabrielleeg1.bedrockvoid.protocol.types.PlayStatus.LoginSuccess
 import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus.Completed
 import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus.HaveAllPacks
@@ -30,53 +42,56 @@ import mu.KotlinLogging
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors
 
-val json = Json {
-  ignoreUnknownKeys = true
-}
+private val logger = KotlinLogging.logger { }
 
-val ctx = CoroutineName("bedrock-void") +
+private val ctx = CoroutineName("bedrock-void") +
   Executors.newFixedThreadPool(2).asCoroutineDispatcher()
 
-val scope = CoroutineScope(ctx)
+private val scope = CoroutineScope(ctx)
 
-private val motd = BedrockMotd(
+private val motd = MinecraftMotd(
   edition = "MCPE",
   motd = "My Server",
   playerCount = 0,
   maxPlayerCount = 20,
   gameType = "Survival",
   protocolVersion = 465,
-  version = "1.0"
+  version = "1.0",
 )
-
-private val logger = KotlinLogging.logger { }
 
 @ExperimentalStdlibApi
 suspend fun main(): Unit = withContext(ctx) {
   logger.info { "Creating server..." }
 
+  val codec = PacketCodec(
+    json = Json {
+      ignoreUnknownKeys = true
+    },
+    inboundPackets = mapOf(
+      withPacketId(LoginPacketDecoder),
+      withPacketId(InboundHandshakePacketDecoder),
+      withPacketId(ResourcePackResponsePacketDecoder),
+      withPacketId(ClientCacheStatusPacketDecoder),
+      withPacketId(ViolationWarningPacketDecoder),
+    ),
+    outboundPackets = mapOf(
+      withPacketId(PlayStatusPacketEncoder),
+      withPacketId(OutboundHandshakePacketEncoder),
+      withPacketId(DisconnectPacketEncoder),
+      withPacketId(ResourcePacksInfoPacketEncoder),
+      withPacketId(ResourcePacksStackPacketEncoder),
+    ),
+  )
+
   val address = InetSocketAddress("0.0.0.0", 19132)
-  val server = MinecraftServer(address, motd, serializers, deserializers, ::onSessionCreated)
+  val server = MinecraftServer(address, motd, codec, ::onSessionCreated)
 
   server.bind()
 }
 
-fun handleResourcePack(session: MinecraftSession) {
-  session.inboundPacketFlow.filterIsInstance<ResourcePackResponsePacket>().onEach { packet ->
-    when (packet.status) {
-      None -> session.disconnect("TODO: None")
-      Refused -> session.disconnect("TODO: Refused")
-      SendPackets -> session.disconnect("TODO: HaveAllPacks")
-      HaveAllPacks -> session.sendPacket(
-        ResourcePackStackPacket(
-          requireAccept = false,
-          gameVersion = "1.17.30",
-          experimentsPreviouslyToggled = false,
-        ),
-      )
-      Completed -> {}
-    }
-  }.launchIn(scope)
+fun onSessionCreated(session: MinecraftSession) {
+  handleLogin(session)
+  handleResourcePack(session)
 }
 
 fun handleLogin(session: MinecraftSession) {
@@ -112,7 +127,21 @@ fun handleLogin(session: MinecraftSession) {
   }.launchIn(scope)
 }
 
-fun onSessionCreated(session: MinecraftSession) {
-  handleLogin(session)
-  handleResourcePack(session)
+fun handleResourcePack(session: MinecraftSession) {
+  session.inboundPacketFlow.filterIsInstance<ResourcePackResponsePacket>().onEach { packet ->
+    when (packet.status) {
+      None -> session.disconnect("TODO: None")
+      Refused -> session.disconnect("TODO: Refused")
+      SendPackets -> session.disconnect("TODO: HaveAllPacks")
+      HaveAllPacks -> session.sendPacket(
+        ResourcePacksStackPacket(
+          requireAccept = false,
+          gameVersion = "1.17.30",
+          experimentsPreviouslyToggled = false,
+        ),
+      )
+      Completed -> {
+      }
+    }
+  }.launchIn(scope)
 }
