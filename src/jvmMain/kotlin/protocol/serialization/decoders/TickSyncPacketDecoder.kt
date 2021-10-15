@@ -1,6 +1,6 @@
 package com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders
 
-import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.TickSyncPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.any.TickSyncPacket
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketDecoder
 import protocol.serialization.DecodingStrategy
 
