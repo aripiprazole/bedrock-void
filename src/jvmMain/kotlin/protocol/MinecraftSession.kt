@@ -40,7 +40,11 @@ class MinecraftSession(
 
       val packetId = packetBuf.readVarInt()
       val decodingStrategy = codec.inboundPackets[packetId]
-        ?: error("Packet ${packetId.toHexString()} does not have a deserializer")
+      if (decodingStrategy == null) {
+        logger.warn("Unhandled packet [${packetId.toHexString()}] due to not having a decoding strategy")
+
+        continue
+      }
 
       logger.debug {
         "Reading packet with id [${packetId.toHexString()}] and decoder [$decodingStrategy]"
