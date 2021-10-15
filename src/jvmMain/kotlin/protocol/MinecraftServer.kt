@@ -4,7 +4,7 @@ package com.gabrielleeg1.bedrockvoid.protocol
 
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketCodec
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingCodec
 import com.gabrielleeg1.bedrockvoid.protocol.types.PlayStatus.LoginSuccess
 import com.gabrielleeg1.bedrockvoid.protocol.utils.decompress
 import com.nukkitx.network.raknet.EncapsulatedPacket
@@ -25,7 +25,7 @@ import java.net.InetSocketAddress
 class MinecraftServer(
   private val address: InetSocketAddress,
   private val motd: MinecraftMotd,
-  private val codec: PacketCodec,
+  private val codec: EncodingCodec,
   private val onSessionConnected: suspend (MinecraftSession) -> Unit = {},
   private val onSessionDisconnected: suspend (MinecraftSession) -> Unit = {},
 ) {

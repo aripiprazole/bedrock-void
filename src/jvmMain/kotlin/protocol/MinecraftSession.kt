@@ -4,9 +4,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.packets.InboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.utils.getPacketId
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.ByteBufDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.ByteBufEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketCodec
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingCodec
 import com.gabrielleeg1.bedrockvoid.protocol.types.readVarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.toHexString
 import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarInt
@@ -25,7 +23,7 @@ import kotlin.reflect.full.starProjectedType
 
 class MinecraftSession(
   private val session: RakNetServerSession,
-  private val codec: PacketCodec,
+  private val codec: EncodingCodec,
 ) {
   val address: InetSocketAddress by session::address
 
@@ -43,7 +41,6 @@ class MinecraftSession(
       }
 
       val packetId = packetBuf.readVarInt()
-      val decoder = ByteBufDecoder(packetBuf, codec.json)
       val decodingStrategy = codec.inboundPackets[packetId]
         ?: error("Packet ${packetId.toHexString()} does not have a deserializer")
 
@@ -52,7 +49,7 @@ class MinecraftSession(
       }
 
       decodingStrategy.run {
-        _inboundPacketFlow.emit(decoder.decodePacket())
+        _inboundPacketFlow.emit(codec.decodingStream(packetBuf).decodeValue())
       }
     }
   }
@@ -86,10 +83,8 @@ class MinecraftSession(
         "Sending packet with id ${id.toHexString()} and encoding strategy $encodingStrategy"
       }
 
-      val encoder = ByteBufEncoder(packetBuf, codec.json)
-
       encodingStrategy.run {
-        encoder.encodePacket(packet)
+        codec.encodingStream(packetBuf).encodeValue(packet)
       }
 
       uncompressed.writeVarInt(packetBuf.readableBytes())

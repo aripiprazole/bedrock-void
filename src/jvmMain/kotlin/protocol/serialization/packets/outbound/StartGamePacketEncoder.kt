@@ -1,7 +1,7 @@
-package com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders
+package com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound
 
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.StartGamePacket
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 import com.gabrielleeg1.bedrockvoid.protocol.types.BlockPos
 import com.gabrielleeg1.bedrockvoid.protocol.types.EducationSharedResourceUri
 import com.gabrielleeg1.bedrockvoid.protocol.types.Vec2
@@ -9,30 +9,30 @@ import com.gabrielleeg1.bedrockvoid.protocol.types.Vec3
 import protocol.serialization.EncodingStrategy
 
 object StartGamePacketEncoder : EncodingStrategy<StartGamePacket> {
-  private fun PacketEncoder.encodeVec3(value: Vec3) {
+  private fun EncodingStream.encodeVec3(value: Vec3) {
     encodeFloatLE(value.x)
     encodeFloatLE(value.y)
     encodeFloatLE(value.z)
   }
 
-  private fun PacketEncoder.encodeVec2(value: Vec2) {
+  private fun EncodingStream.encodeVec2(value: Vec2) {
     encodeFloatLE(value.yaw)
     encodeFloatLE(value.pitch)
   }
 
-  private fun PacketEncoder.encodeBlockPos(value: BlockPos) {
+  private fun EncodingStream.encodeBlockPos(value: BlockPos) {
     encodeVarInt(value.x)
     encodeVarUInt(value.y.toUInt())
     encodeVarInt(value.z)
   }
 
-  private fun PacketEncoder.encodeEducationSharedResourceUri(value: EducationSharedResourceUri) {
+  private fun EncodingStream.encodeEducationSharedResourceUri(value: EducationSharedResourceUri) {
     encodeString(value.uri)
     encodeString(value.name)
   }
 
   @Suppress("LongMethod")
-  override fun PacketEncoder.encodePacket(value: StartGamePacket) {
+  override fun EncodingStream.encodeValue(value: StartGamePacket) {
     encodeVarLong(value.entityId)
     encodeVarULong(value.runtimeEntityId)
     encodeVarInt(value.gameMode)

@@ -2,7 +2,7 @@ package com.gabrielleeg1.bedrockvoid.protocol.serialization
 
 import kotlinx.serialization.json.Json
 
-interface PacketDecoder {
+interface DecodingStream {
   val json: Json
 
   fun decodeBoolean(): Boolean
@@ -32,9 +32,9 @@ interface PacketDecoder {
   fun decodeByte(): Byte
   fun decodeUByte(): UByte
 
-  fun <T> decodeArrayShortLE(decode: PacketDecoder.() -> T): List<T>
-  fun <T> decodeArrayIntLE(decode: PacketDecoder.() -> T): List<T>
-  fun <T> decodeArray(decode: PacketDecoder.() -> T): List<T>
+  fun <T> decodeArrayShortLE(decode: DecodingStream.() -> T): List<T>
+  fun <T> decodeArrayIntLE(decode: DecodingStream.() -> T): List<T>
+  fun <T> decodeArray(decode: DecodingStream.() -> T): List<T>
 
-  fun decodeSlice(length: Int): PacketDecoder
+  fun decodeSlice(length: Int): DecodingStream
 }

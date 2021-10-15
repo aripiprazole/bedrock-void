@@ -1,11 +1,11 @@
-package com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders
+package com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound
 
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.OutboundHandshakePacket
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 import protocol.serialization.EncodingStrategy
 
 object OutboundHandshakePacketEncoder : EncodingStrategy<OutboundHandshakePacket> {
-  override fun PacketEncoder.encodePacket(value: OutboundHandshakePacket) {
+  override fun EncodingStream.encodeValue(value: OutboundHandshakePacket) {
     encodeVarInt(value.jwtData.length)
     encodeBytes(value.jwtData.toByteArray())
   }

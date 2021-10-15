@@ -1,8 +1,7 @@
 package protocol.serialization
 
-import com.gabrielleeg1.bedrockvoid.protocol.packets.OutboundPacket
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 
-fun interface EncodingStrategy<T : OutboundPacket> {
-  fun PacketEncoder.encodePacket(value: T)
+fun interface EncodingStrategy<T> {
+  fun EncodingStream.encodeValue(value: T)
 }

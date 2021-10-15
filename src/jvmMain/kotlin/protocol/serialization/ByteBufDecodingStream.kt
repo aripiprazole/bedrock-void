@@ -5,7 +5,11 @@ import com.gabrielleeg1.bedrockvoid.protocol.types.readVarLong
 import io.netty.buffer.ByteBuf
 import kotlinx.serialization.json.Json
 
-class ByteBufDecoder(private val buf: ByteBuf, override val json: Json) : PacketDecoder {
+class ByteBufDecodingStream(
+  private val buf: ByteBuf,
+  private val codec: EncodingCodec,
+  override val json: Json,
+) : DecodingStream {
   override fun decodeBoolean(): Boolean = buf.readBoolean()
   override fun decodeInt(): Int = buf.readInt()
   override fun decodeVarInt(): Int = buf.readVarInt()
@@ -36,17 +40,18 @@ class ByteBufDecoder(private val buf: ByteBuf, override val json: Json) : Packet
       .decodeToString()
   }
 
-  override fun <T> decodeArrayShortLE(decode: PacketDecoder.() -> T): List<T> {
+  override fun <T> decodeArrayShortLE(decode: DecodingStream.() -> T): List<T> {
     return (1..decodeShortLE()).map { decode() }
   }
 
-  override fun <T> decodeArrayIntLE(decode: PacketDecoder.() -> T): List<T> {
+  override fun <T> decodeArrayIntLE(decode: DecodingStream.() -> T): List<T> {
     return (1..decodeIntLE()).map { decode() }
   }
 
-  override fun <T> decodeArray(decode: PacketDecoder.() -> T): List<T> {
+  override fun <T> decodeArray(decode: DecodingStream.() -> T): List<T> {
     return (1..decodeVarInt()).map { decode() }
   }
 
-  override fun decodeSlice(length: Int): PacketDecoder = ByteBufDecoder(buf.readSlice(length), json)
+  override fun decodeSlice(length: Int): DecodingStream =
+    ByteBufDecodingStream(buf.readSlice(length), codec, json)
 }

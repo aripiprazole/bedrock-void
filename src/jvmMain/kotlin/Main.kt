@@ -5,41 +5,45 @@ package com.gabrielleeg1.bedrockvoid
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftMotd
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftServer
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftSession
+import com.gabrielleeg1.bedrockvoid.protocol.packets.any.AnimatePacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.any.InteractPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.any.MovePlayerPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.any.TickSyncPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ClientCacheStatusPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.InboundHandshakePacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.LoginPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.RequestChunkRadiusPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ResourcePackResponsePacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.SetLocalPlayerAsInitializedPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.inbound.ViolationWarningPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.BiomeDefinitionListPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ChunkRadiusUpdatedPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.CreativeContentPacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.DisconnectPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.PlayStatusPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksInfoPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksStackPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.StartGamePacket
-import com.gabrielleeg1.bedrockvoid.protocol.packets.utils.withPacketId
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketCodec
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.AnimatePacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.ClientCacheStatusPacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.InboundHandshakePacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.InteractPacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.LoginPacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.MovePlayerPacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.RequestChunkRadiusPacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.ResourcePackResponsePacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.SetLocalPlayerAsInitializedPacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.TickSyncPacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders.ViolationWarningPacketDecoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.BiomeDefinitionListPacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.ChunkRadiusUpdatedPacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.CreativeContentPacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.DisconnectPacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.OutboundHandshakePacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.PlayStatusPacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.ResourcePacksInfoPacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.ResourcePacksStackPacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.StartGamePacketEncoder
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders.TickSyncPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingCodec
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.AnimatePacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.InteractPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.MovePlayerPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.TickSyncPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.inbound.ClientCacheStatusPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.inbound.InboundHandshakePacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.inbound.LoginPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.inbound.RequestChunkRadiusPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.inbound.ResourcePackResponsePacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.inbound.SetLocalPlayerAsInitializedPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.inbound.ViolationWarningPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.BiomeDefinitionListPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.ChunkRadiusUpdatedPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.CreativeContentPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.DisconnectPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.PlayStatusPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.ResourcePacksInfoPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.ResourcePacksStackPacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.StartGamePacketEncoder
 import com.gabrielleeg1.bedrockvoid.protocol.types.BlockPos
 import com.gabrielleeg1.bedrockvoid.protocol.types.EducationSharedResourceUri
 import com.gabrielleeg1.bedrockvoid.protocol.types.PlayStatus.LoginSuccess
@@ -96,35 +100,31 @@ private const val BIOME_DEFINITION_LIST =
 suspend fun main(): Unit = withContext(ctx) {
   logger.info { "Creating server..." }
 
-  val codec = PacketCodec(
+  val codec = EncodingCodec(
     json = Json {
       ignoreUnknownKeys = true
     },
-    inboundPackets = mapOf(
-      withPacketId(LoginPacketDecoder),
-      withPacketId(InboundHandshakePacketDecoder),
-      withPacketId(ResourcePackResponsePacketDecoder),
-      withPacketId(ClientCacheStatusPacketDecoder),
-      withPacketId(ViolationWarningPacketDecoder),
-      withPacketId(RequestChunkRadiusPacketDecoder),
-      withPacketId(TickSyncPacketDecoder),
-      withPacketId(MovePlayerPacketDecoder),
-      withPacketId(InteractPacketDecoder),
-      withPacketId(SetLocalPlayerAsInitializedPacketDecoder),
-      withPacketId(AnimatePacketDecoder),
-    ),
-    outboundPackets = mapOf(
-      withPacketId(PlayStatusPacketEncoder),
-      withPacketId(OutboundHandshakePacketEncoder),
-      withPacketId(DisconnectPacketEncoder),
-      withPacketId(ResourcePacksInfoPacketEncoder),
-      withPacketId(ResourcePacksStackPacketEncoder),
-      withPacketId(StartGamePacketEncoder),
-      withPacketId(ChunkRadiusUpdatedPacketEncoder),
-      withPacketId(CreativeContentPacketEncoder),
-      withPacketId(BiomeDefinitionListPacketEncoder),
-      withPacketId(TickSyncPacketEncoder),
-    ),
+    strategies = buildMap {
+      put(LoginPacket::class, LoginPacketEncoder)
+      put(InboundHandshakePacket::class, InboundHandshakePacketEncoder)
+      put(ResourcePackResponsePacket::class, ResourcePackResponsePacketEncoder)
+      put(ResourcePacksInfoPacket::class, ResourcePacksInfoPacketEncoder)
+      put(ResourcePacksStackPacket::class, ResourcePacksStackPacketEncoder)
+      put(ClientCacheStatusPacket::class, ClientCacheStatusPacketEncoder)
+      put(ViolationWarningPacket::class, ViolationWarningPacketEncoder)
+      put(RequestChunkRadiusPacket::class, RequestChunkRadiusPacketEncoder)
+      put(TickSyncPacket::class, TickSyncPacketEncoder)
+      put(MovePlayerPacket::class, MovePlayerPacketEncoder)
+      put(InteractPacket::class, InteractPacketEncoder)
+      put(SetLocalPlayerAsInitializedPacket::class, SetLocalPlayerAsInitializedPacketEncoder)
+      put(AnimatePacket::class, AnimatePacketEncoder)
+      put(PlayStatusPacket::class, PlayStatusPacketEncoder)
+      put(DisconnectPacket::class, DisconnectPacketEncoder)
+      put(StartGamePacket::class, StartGamePacketEncoder)
+      put(ChunkRadiusUpdatedPacket::class, ChunkRadiusUpdatedPacketEncoder)
+      put(CreativeContentPacket::class, CreativeContentPacketEncoder)
+      put(BiomeDefinitionListPacket::class, BiomeDefinitionListPacketEncoder)
+    },
   )
 
   val address = InetSocketAddress("0.0.0.0", 19132)
@@ -271,7 +271,8 @@ fun handlePlayerPackets(session: MinecraftSession) {
           initialized = true
         }
       }
-      is TickSyncPacket -> {}
+      is TickSyncPacket -> {
+      }
     }
   }.launchIn(scope)
 }

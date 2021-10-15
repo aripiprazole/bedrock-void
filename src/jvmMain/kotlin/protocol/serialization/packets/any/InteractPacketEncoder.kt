@@ -1,16 +1,16 @@
-package com.gabrielleeg1.bedrockvoid.protocol.serialization.decoders
+package com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any
 
 import com.gabrielleeg1.bedrockvoid.protocol.packets.any.InteractPacket
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketDecoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.DecodingStream
 import com.gabrielleeg1.bedrockvoid.protocol.types.Vec3
 import protocol.serialization.DecodingStrategy
 
-object InteractPacketDecoder : DecodingStrategy<InteractPacket> {
-  private fun PacketDecoder.decodeVec3(): Vec3 {
+object InteractPacketEncoder : DecodingStrategy<InteractPacket> {
+  private fun DecodingStream.decodeVec3(): Vec3 {
     return Vec3(decodeFloatLE(), decodeFloatLE(), decodeFloatLE())
   }
 
-  override fun PacketDecoder.decodePacket(): InteractPacket {
+  override fun DecodingStream.decodeValue(): InteractPacket {
     val actionId = decodeByte()
     val targetRuntimeEntityId = decodeVarLong()
     val position = decodeVec3()

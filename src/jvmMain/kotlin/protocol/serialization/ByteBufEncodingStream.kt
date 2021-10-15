@@ -5,7 +5,11 @@ import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarLong
 import io.netty.buffer.ByteBuf
 import kotlinx.serialization.json.Json
 
-class ByteBufEncoder(private val buf: ByteBuf, override val json: Json) : PacketEncoder {
+class ByteBufEncodingStream(
+  private val buf: ByteBuf,
+  private val codec: EncodingCodec,
+  override val json: Json,
+) : EncodingStream {
   override fun encodeBoolean(value: Boolean) {
     buf.writeBoolean(value)
   }
@@ -78,7 +82,7 @@ class ByteBufEncoder(private val buf: ByteBuf, override val json: Json) : Packet
 
   override fun <T> encodeArrayShortLE(
     array: Collection<T>,
-    encode: PacketEncoder.(value: T) -> Unit
+    encode: EncodingStream.(value: T) -> Unit
   ) {
     encodeShortLE(array.size.toShort())
     array.forEach {
@@ -88,7 +92,7 @@ class ByteBufEncoder(private val buf: ByteBuf, override val json: Json) : Packet
 
   override fun <T> encodeArrayIntLE(
     array: Collection<T>,
-    encode: PacketEncoder.(value: T) -> Unit
+    encode: EncodingStream.(value: T) -> Unit
   ) {
     encodeIntLE(array.size)
     array.forEach {
@@ -96,7 +100,7 @@ class ByteBufEncoder(private val buf: ByteBuf, override val json: Json) : Packet
     }
   }
 
-  override fun <T> encodeArray(array: Collection<T>, encode: PacketEncoder.(value: T) -> Unit) {
+  override fun <T> encodeArray(array: Collection<T>, encode: EncodingStream.(value: T) -> Unit) {
     encodeVarUInt(array.size.toUInt())
     array.forEach {
       encode(it)

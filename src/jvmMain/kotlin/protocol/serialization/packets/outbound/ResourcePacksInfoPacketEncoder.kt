@@ -1,13 +1,13 @@
-package com.gabrielleeg1.bedrockvoid.protocol.serialization.encoders
+package com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound
 
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksInfoPacket
-import com.gabrielleeg1.bedrockvoid.protocol.serialization.PacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 import com.gabrielleeg1.bedrockvoid.protocol.types.BehaviorPack
 import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePack
 import protocol.serialization.EncodingStrategy
 
 object ResourcePacksInfoPacketEncoder : EncodingStrategy<ResourcePacksInfoPacket> {
-  private fun PacketEncoder.encodeBehaviorPack(value: BehaviorPack) {
+  private fun EncodingStream.encodeBehaviorPack(value: BehaviorPack) {
     encodeString(value.id)
     encodeString(value.version)
     encodeLongLE(value.size)
@@ -17,7 +17,7 @@ object ResourcePacksInfoPacketEncoder : EncodingStrategy<ResourcePacksInfoPacket
     encodeBoolean(value.scriptingEnabled)
   }
 
-  private fun PacketEncoder.encodeResourcePack(value: ResourcePack) {
+  private fun EncodingStream.encodeResourcePack(value: ResourcePack) {
     encodeString(value.id)
     encodeString(value.version)
     encodeLongLE(value.size)
@@ -28,7 +28,7 @@ object ResourcePacksInfoPacketEncoder : EncodingStrategy<ResourcePacksInfoPacket
     encodeBoolean(value.raytracingCapable)
   }
 
-  override fun PacketEncoder.encodePacket(value: ResourcePacksInfoPacket) {
+  override fun EncodingStream.encodeValue(value: ResourcePacksInfoPacket) {
     encodeBoolean(value.requireAccept)
     encodeBoolean(value.scriptingEnabled)
     encodeBoolean(value.forcingServerPacksEnabled)
