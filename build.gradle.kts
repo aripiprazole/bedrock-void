@@ -2,7 +2,7 @@
 
 plugins {
   kotlin("multiplatform") version "1.5.10"
-  kotlin("plugin.serialization") version "1.5.31"
+  kotlin("plugin.serialization") version "1.5.10"
   id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
   id("io.gitlab.arturbosch.detekt").version("1.18.1")
 }
