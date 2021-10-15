@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 import protocol.serialization.EncodingStrategy
 
 object ChunkRadiusUpdatedPacketEncoder : EncodingStrategy<ChunkRadiusUpdatedPacket> {
-  override fun EncodingStream.encodeValue(value: ChunkRadiusUpdatedPacket) {
+  override fun EncodingStream.encodeT(value: ChunkRadiusUpdatedPacket) {
     encodeVarInt(value.chunkRadius)
   }
 }

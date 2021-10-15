@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 import protocol.serialization.EncodingStrategy
 
 object CreativeContentPacketEncoder : EncodingStrategy<CreativeContentPacket> {
-  override fun EncodingStream.encodeValue(value: CreativeContentPacket) {
-    encodeArray(value.content) { TODO() }
+  override fun EncodingStream.encodeT(value: CreativeContentPacket) {
+    encodeArray(value.content)
   }
 }

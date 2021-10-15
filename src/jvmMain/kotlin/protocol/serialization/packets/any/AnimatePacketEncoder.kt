@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.DecodingStream
 import protocol.serialization.DecodingStrategy
 
 object AnimatePacketEncoder : DecodingStrategy<AnimatePacket> {
-  override fun DecodingStream.decodeValue(): AnimatePacket {
+  override fun DecodingStream.decodeT(): AnimatePacket {
     val actionId = decodeInt()
     val runtimeEntityId = decodeVarLong()
 

@@ -2,42 +2,16 @@ package com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound
 
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.StartGamePacket
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
-import com.gabrielleeg1.bedrockvoid.protocol.types.BlockPos
-import com.gabrielleeg1.bedrockvoid.protocol.types.EducationSharedResourceUri
-import com.gabrielleeg1.bedrockvoid.protocol.types.Vec2
-import com.gabrielleeg1.bedrockvoid.protocol.types.Vec3
 import protocol.serialization.EncodingStrategy
 
 object StartGamePacketEncoder : EncodingStrategy<StartGamePacket> {
-  private fun EncodingStream.encodeVec3(value: Vec3) {
-    encodeFloatLE(value.x)
-    encodeFloatLE(value.y)
-    encodeFloatLE(value.z)
-  }
-
-  private fun EncodingStream.encodeVec2(value: Vec2) {
-    encodeFloatLE(value.yaw)
-    encodeFloatLE(value.pitch)
-  }
-
-  private fun EncodingStream.encodeBlockPos(value: BlockPos) {
-    encodeVarInt(value.x)
-    encodeVarUInt(value.y.toUInt())
-    encodeVarInt(value.z)
-  }
-
-  private fun EncodingStream.encodeEducationSharedResourceUri(value: EducationSharedResourceUri) {
-    encodeString(value.uri)
-    encodeString(value.name)
-  }
-
   @Suppress("LongMethod")
-  override fun EncodingStream.encodeValue(value: StartGamePacket) {
+  override fun EncodingStream.encodeT(value: StartGamePacket) {
     encodeVarLong(value.entityId)
     encodeVarULong(value.runtimeEntityId)
     encodeVarInt(value.gameMode)
-    encodeVec3(value.spawn)
-    encodeVec2(value.rotation)
+    encodeValue(value.spawn)
+    encodeValue(value.rotation)
     encodeVarInt(value.worldSeed)
     encodeShortLE(value.spawnBiomeType)
     encodeString(value.customBiomeName)
@@ -45,7 +19,7 @@ object StartGamePacketEncoder : EncodingStrategy<StartGamePacket> {
     encodeVarInt(value.generator)
     encodeVarInt(value.worldGameMode)
     encodeVarInt(value.difficulty)
-    encodeBlockPos(value.worldSpawn)
+    encodeValue(value.worldSpawn)
     encodeBoolean(value.achievementsDisabled)
     encodeVarInt(value.dayCycleStopTime)
     encodeVarInt(value.educationOffer)
@@ -60,11 +34,8 @@ object StartGamePacketEncoder : EncodingStrategy<StartGamePacket> {
     encodeVarInt(value.platformBroadcastMode)
     encodeBoolean(value.commandsEnabled)
     encodeBoolean(value.requiredTexturePacks)
-    encodeArray(value.gameRules) { TODO() }
-    encodeArrayIntLE(value.experiments) {
-      encodeString(it.name)
-      encodeBoolean(it.enabled)
-    }
+    encodeArray(value.gameRules)
+    encodeArrayIntLE(value.experiments)
     encodeBoolean(value.experimentsPreviouslyEnabled)
     encodeBoolean(value.bonusChest)
     encodeBoolean(value.startWithMapEnabled)
@@ -81,7 +52,7 @@ object StartGamePacketEncoder : EncodingStrategy<StartGamePacket> {
     encodeIntLE(value.limitedWorldHeight)
     encodeIntLE(value.limitedWorldWidth)
     encodeBoolean(value.newNether)
-    encodeEducationSharedResourceUri(value.educationSharedResourceUri)
+    encodeValue(value.educationSharedResourceUri)
     encodeBoolean(value.forceExperimentalGameplay)
     if (value.forceExperimentalGameplay) {
       encodeBoolean(value.forceExperimentalGameplay)
@@ -95,8 +66,8 @@ object StartGamePacketEncoder : EncodingStrategy<StartGamePacket> {
     encodeBoolean(value.serverAuthoritativeBlockBreaking)
     encodeLongLE(value.time)
     encodeVarInt(value.enchantmentSeed)
-    encodeArray(value.blocks) { TODO() }
-    encodeArray(value.items) { TODO() }
+    encodeArray(value.blocks)
+    encodeArray(value.items)
     encodeString(value.multiplayerCorrelationId)
     encodeBoolean(value.serverAuthoritativeInventory)
     encodeString(value.gameVersion)

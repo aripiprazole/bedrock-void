@@ -9,7 +9,6 @@ import protocol.serialization.DecodingStrategy
 import protocol.serialization.EncodingStrategy
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.starProjectedType
 
 @Suppress("UNCHECKED_CAST")
 class EncodingCodec(val json: Json, strategies: Map<KClass<*>, Any>) {
@@ -21,12 +20,12 @@ class EncodingCodec(val json: Json, strategies: Map<KClass<*>, Any>) {
 
   val inboundPackets = decoders
     .filter { (kClass) -> kClass.isSubclassOf(InboundPacket::class) }
-    .mapKeys { (kClass) -> getPacketId(kClass.starProjectedType) } as
+    .mapKeys { (kClass) -> getPacketId(kClass) } as
     Map<Int, DecodingStrategy<InboundPacket>>
 
   val outboundPackets = encoders
     .filter { (kClass) -> kClass.isSubclassOf(OutboundPacket::class) }
-    .mapKeys { (kClass) -> getPacketId(kClass.starProjectedType) } as
+    .mapKeys { (kClass) -> getPacketId(kClass) } as
     Map<Int, EncodingStrategy<OutboundPacket>>
 
   fun encodingStream(buf: ByteBuf): EncodingStream {

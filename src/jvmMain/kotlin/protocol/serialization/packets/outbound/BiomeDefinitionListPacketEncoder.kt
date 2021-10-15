@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 import protocol.serialization.EncodingStrategy
 
 object BiomeDefinitionListPacketEncoder : EncodingStrategy<BiomeDefinitionListPacket> {
-  override fun EncodingStream.encodeValue(value: BiomeDefinitionListPacket) {
+  override fun EncodingStream.encodeT(value: BiomeDefinitionListPacket) {
     encodeBytes(value.biomeDefinitions)
   }
 }

@@ -4,6 +4,8 @@ import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.writeVarLong
 import io.netty.buffer.ByteBuf
 import kotlinx.serialization.json.Json
+import protocol.serialization.EncodingStrategy
+import kotlin.reflect.KClass
 
 class ByteBufEncodingStream(
   private val buf: ByteBuf,
@@ -80,9 +82,9 @@ class ByteBufEncodingStream(
     buf.writeDoubleLE(value)
   }
 
-  override fun <T> encodeArrayShortLE(
+  override fun <T : Any> encodeArrayShortLE(
     array: Collection<T>,
-    encode: EncodingStream.(value: T) -> Unit
+    encode: EncodingStream.(T) -> Unit,
   ) {
     encodeShortLE(array.size.toShort())
     array.forEach {
@@ -90,9 +92,9 @@ class ByteBufEncodingStream(
     }
   }
 
-  override fun <T> encodeArrayIntLE(
+  override fun <T : Any> encodeArrayIntLE(
     array: Collection<T>,
-    encode: EncodingStream.(value: T) -> Unit
+    encode: EncodingStream.(T) -> Unit,
   ) {
     encodeIntLE(array.size)
     array.forEach {
@@ -100,11 +102,19 @@ class ByteBufEncodingStream(
     }
   }
 
-  override fun <T> encodeArray(array: Collection<T>, encode: EncodingStream.(value: T) -> Unit) {
+  override fun <T : Any> encodeArray(array: Collection<T>, encode: EncodingStream.(T) -> Unit) {
     encodeVarUInt(array.size.toUInt())
     array.forEach {
       encode(it)
     }
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  override fun <T : Any> encodeValue(value: T) {
+    val strategy = codec.encoders[value::class as KClass<Any>] as? EncodingStrategy<T>
+      ?: error("Unknown encoding strategy for ${value::class}")
+
+    return encodeWith(strategy, value)
   }
 
   override fun encodeBytes(bytes: ByteArray) {

@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Vec2(
-  val yaw: Float,
-  val pitch: Float,
+  val x: Float,
+  val y: Float,
 )

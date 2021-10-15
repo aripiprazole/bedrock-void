@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 import protocol.serialization.EncodingStrategy
 
 object PlayStatusPacketEncoder : EncodingStrategy<PlayStatusPacket> {
-  override fun EncodingStream.encodeValue(value: PlayStatusPacket) {
+  override fun EncodingStream.encodeT(value: PlayStatusPacket) {
     encodeInt(value.status.ordinal)
   }
 }

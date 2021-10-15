@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.DecodingStream
 import protocol.serialization.DecodingStrategy
 
 object InboundHandshakePacketEncoder : DecodingStrategy<InboundHandshakePacket> {
-  override fun DecodingStream.decodeValue(): InboundHandshakePacket {
+  override fun DecodingStream.decodeT(): InboundHandshakePacket {
     return InboundHandshakePacket()
   }
 }

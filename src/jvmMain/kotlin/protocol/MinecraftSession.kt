@@ -17,9 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import mu.KLogging
-import protocol.serialization.EncodingStrategy
 import java.net.InetSocketAddress
-import kotlin.reflect.full.starProjectedType
 
 class MinecraftSession(
   private val session: RakNetServerSession,
@@ -49,7 +47,7 @@ class MinecraftSession(
       }
 
       decodingStrategy.run {
-        _inboundPacketFlow.emit(codec.decodingStream(packetBuf).decodeValue())
+        _inboundPacketFlow.emit(codec.decodingStream(packetBuf).decodeT())
       }
     }
   }
@@ -66,7 +64,7 @@ class MinecraftSession(
     val uncompressed = ByteBufAllocator.DEFAULT.buffer(1 shl 3) // (packet list size) << 3
 
     packets.forEach { packet ->
-      val id = getPacketId(packet::class.starProjectedType)
+      val id = getPacketId(packet::class)
       val packetBuf = ByteBufAllocator.DEFAULT.ioBuffer()
 
       packetBuf.writeVarInt( // write packet head
@@ -76,7 +74,7 @@ class MinecraftSession(
       )
 
       @Suppress("UNCHECKED_CAST")
-      val encodingStrategy = codec.outboundPackets[id] as? EncodingStrategy<OutboundPacket>
+      val encodingStrategy = codec.outboundPackets[id]
         ?: error("Packet ${packet::class.simpleName} does not have an encoder")
 
       logger.debug {
@@ -84,7 +82,7 @@ class MinecraftSession(
       }
 
       encodingStrategy.run {
-        codec.encodingStream(packetBuf).encodeValue(packet)
+        codec.encodingStream(packetBuf).encodeT(packet)
       }
 
       uncompressed.writeVarInt(packetBuf.readableBytes())

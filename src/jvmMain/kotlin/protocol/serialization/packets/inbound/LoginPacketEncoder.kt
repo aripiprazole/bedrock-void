@@ -12,7 +12,7 @@ object LoginPacketEncoder : DecodingStrategy<LoginPacket> {
     return Base64.getDecoder().decode(base64.split("\\.".toRegex())[1]).decodeToString()
   }
 
-  override fun DecodingStream.decodeValue(): LoginPacket {
+  override fun DecodingStream.decodeT(): LoginPacket {
     val protocolVersion = decodeInt()
 
     val jwt = decodeSlice(decodeVarInt())
@@ -30,6 +30,10 @@ object LoginPacketEncoder : DecodingStrategy<LoginPacket> {
     }
     val skinData = jwt.decodeStringLE()
 
-    return LoginPacket(protocolVersion, chainData, skinData)
+    return LoginPacket(
+      protocolVersion,
+      chainData,
+      skinData,
+    )
   }
 }

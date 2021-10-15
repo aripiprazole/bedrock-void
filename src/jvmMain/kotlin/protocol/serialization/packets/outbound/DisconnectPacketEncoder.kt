@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingStream
 import protocol.serialization.EncodingStrategy
 
 object DisconnectPacketEncoder : EncodingStrategy<DisconnectPacket> {
-  override fun EncodingStream.encodeValue(value: DisconnectPacket) {
+  override fun EncodingStream.encodeT(value: DisconnectPacket) {
     encodeBoolean(value.hideDisconnectPacket)
     encodeString(value.kickMessage)
   }

@@ -6,9 +6,7 @@ import protocol.serialization.DecodingStrategy
 
 object SetLocalPlayerAsInitializedPacketEncoder :
   DecodingStrategy<SetLocalPlayerAsInitializedPacket> {
-  override fun DecodingStream.decodeValue(): SetLocalPlayerAsInitializedPacket {
-    val entityRuntimeId = decodeVarLong()
-
-    return SetLocalPlayerAsInitializedPacket(entityRuntimeId)
+  override fun DecodingStream.decodeT(): SetLocalPlayerAsInitializedPacket {
+    return SetLocalPlayerAsInitializedPacket(runtimeEntityId = decodeVarLong())
   }
 }

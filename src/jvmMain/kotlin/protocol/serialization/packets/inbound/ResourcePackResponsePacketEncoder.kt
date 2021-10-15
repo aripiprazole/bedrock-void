@@ -6,10 +6,10 @@ import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus
 import protocol.serialization.DecodingStrategy
 
 object ResourcePackResponsePacketEncoder : DecodingStrategy<ResourcePackResponsePacket> {
-  override fun DecodingStream.decodeValue(): ResourcePackResponsePacket {
-    val status = ResourcePackResponseStatus.values()[decodeUByte().toInt()]
-    val ids = decodeArrayShortLE { decodeString() }
-
-    return ResourcePackResponsePacket(status, ids)
+  override fun DecodingStream.decodeT(): ResourcePackResponsePacket {
+    return ResourcePackResponsePacket(
+      status = ResourcePackResponseStatus.values()[decodeUByte().toInt()],
+      ids = decodeArrayShortLE { decodeString() },
+    )
   }
 }

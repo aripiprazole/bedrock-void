@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.DecodingStream
 import protocol.serialization.DecodingStrategy
 
 object ViolationWarningPacketEncoder : DecodingStrategy<ViolationWarningPacket> {
-  override fun DecodingStream.decodeValue(): ViolationWarningPacket {
+  override fun DecodingStream.decodeT(): ViolationWarningPacket {
     return ViolationWarningPacket()
   }
 }

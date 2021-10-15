@@ -4,6 +4,8 @@ import com.gabrielleeg1.bedrockvoid.protocol.types.readVarInt
 import com.gabrielleeg1.bedrockvoid.protocol.types.readVarLong
 import io.netty.buffer.ByteBuf
 import kotlinx.serialization.json.Json
+import protocol.serialization.DecodingStrategy
+import kotlin.reflect.KClass
 
 class ByteBufDecodingStream(
   private val buf: ByteBuf,
@@ -13,6 +15,7 @@ class ByteBufDecodingStream(
   override fun decodeBoolean(): Boolean = buf.readBoolean()
   override fun decodeInt(): Int = buf.readInt()
   override fun decodeVarInt(): Int = buf.readVarInt()
+  override fun decodeVarUInt(): UInt = buf.readVarInt().toUInt()
   override fun decodeIntLE(): Int = buf.readIntLE()
   override fun decodeUInt(): UInt = buf.readUnsignedInt().toUInt()
   override fun decodeLong(): Long = buf.readLong()
@@ -50,6 +53,14 @@ class ByteBufDecodingStream(
 
   override fun <T> decodeArray(decode: DecodingStream.() -> T): List<T> {
     return (1..decodeVarInt()).map { decode() }
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  override fun <T : Any> decodeValue(tClass: KClass<T>): T {
+    val strategy = codec.decoders[tClass as KClass<Any>] as? DecodingStrategy<T>
+      ?: error("Unknown decoding strategy for $tClass")
+
+    return decodeWith(strategy)
   }
 
   override fun decodeSlice(length: Int): DecodingStream =

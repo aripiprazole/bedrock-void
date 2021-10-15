@@ -44,15 +44,27 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.Play
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.ResourcePacksInfoPacketEncoder
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.ResourcePacksStackPacketEncoder
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.outbound.StartGamePacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.types.BehaviorPackEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.types.BlockPosEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.types.EducationSharedResourceUriEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.types.ExperimentDataEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.types.ResourcePackEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.types.StackResourcePackEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.types.Vec2Encoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.types.Vec3Encoder
+import com.gabrielleeg1.bedrockvoid.protocol.types.BehaviorPack
 import com.gabrielleeg1.bedrockvoid.protocol.types.BlockPos
 import com.gabrielleeg1.bedrockvoid.protocol.types.EducationSharedResourceUri
+import com.gabrielleeg1.bedrockvoid.protocol.types.ExperimentData
 import com.gabrielleeg1.bedrockvoid.protocol.types.PlayStatus.LoginSuccess
 import com.gabrielleeg1.bedrockvoid.protocol.types.PlayStatus.PlayerSpawn
+import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePack
 import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus.Completed
 import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus.HaveAllPacks
 import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus.None
 import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus.Refused
 import com.gabrielleeg1.bedrockvoid.protocol.types.ResourcePackResponseStatus.SendPackets
+import com.gabrielleeg1.bedrockvoid.protocol.types.StackResourcePack
 import com.gabrielleeg1.bedrockvoid.protocol.types.Vec2
 import com.gabrielleeg1.bedrockvoid.protocol.types.Vec3
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -124,6 +136,14 @@ suspend fun main(): Unit = withContext(ctx) {
       put(ChunkRadiusUpdatedPacket::class, ChunkRadiusUpdatedPacketEncoder)
       put(CreativeContentPacket::class, CreativeContentPacketEncoder)
       put(BiomeDefinitionListPacket::class, BiomeDefinitionListPacketEncoder)
+      put(Vec3::class, Vec3Encoder)
+      put(Vec2::class, Vec2Encoder)
+      put(StackResourcePack::class, StackResourcePackEncoder)
+      put(ResourcePack::class, ResourcePackEncoder)
+      put(ExperimentData::class, ExperimentDataEncoder)
+      put(EducationSharedResourceUri::class, EducationSharedResourceUriEncoder)
+      put(BlockPos::class, BlockPosEncoder)
+      put(BehaviorPack::class, BehaviorPackEncoder)
     },
   )
 
@@ -192,7 +212,7 @@ fun handleResourcePack(session: MinecraftSession) {
           runtimeEntityId = Random.nextULong(),
           gameMode = 1, // Creative
           spawn = Vec3(x = 0f, y = 0f, z = 0f),
-          rotation = Vec2(yaw = 0f, pitch = 0f),
+          rotation = Vec2(x = 0f, y = 0f),
           worldSeed = Random.nextInt(),
           spawnBiomeType = Random.nextInt().toShort(),
           customBiomeName = "bamboo_jungle",

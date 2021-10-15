@@ -5,7 +5,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.serialization.DecodingStream
 import protocol.serialization.DecodingStrategy
 
 object ClientCacheStatusPacketEncoder : DecodingStrategy<ClientCacheStatusPacket> {
-  override fun DecodingStream.decodeValue(): ClientCacheStatusPacket {
-    return ClientCacheStatusPacket(decodeBoolean())
+  override fun DecodingStream.decodeT(): ClientCacheStatusPacket {
+    return ClientCacheStatusPacket(supported = decodeBoolean())
   }
 }

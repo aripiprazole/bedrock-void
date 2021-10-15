@@ -1,6 +1,7 @@
 package com.gabrielleeg1.bedrockvoid.protocol.serialization
 
 import kotlinx.serialization.json.Json
+import protocol.serialization.EncodingStrategy
 
 interface EncodingStream {
   val json: Json
@@ -29,9 +30,25 @@ interface EncodingStream {
   fun encodeDouble(value: Double)
   fun encodeDoubleLE(value: Double)
 
-  fun <T> encodeArrayShortLE(array: Collection<T>, encode: EncodingStream.(value: T) -> Unit)
-  fun <T> encodeArrayIntLE(array: Collection<T>, encode: EncodingStream.(value: T) -> Unit)
-  fun <T> encodeArray(array: Collection<T>, encode: EncodingStream.(value: T) -> Unit)
+  fun <T : Any> encodeArrayShortLE(
+    array: Collection<T>,
+    encode: EncodingStream.(T) -> Unit = { encodeValue(it) },
+  )
+
+  fun <T : Any> encodeArrayIntLE(
+    array: Collection<T>,
+    encode: EncodingStream.(T) -> Unit = { encodeValue(it) },
+  )
+
+  fun <T : Any> encodeArray(
+    array: Collection<T>,
+    encode: EncodingStream.(T) -> Unit = { encodeValue(it) },
+  )
+
+  fun <T : Any> encodeValue(value: T)
+  fun <T : Any> encodeWith(strategy: EncodingStrategy<T>, value: T): Unit = strategy.run {
+    encodeT(value)
+  }
 
   fun encodeBytes(bytes: ByteArray)
 }
