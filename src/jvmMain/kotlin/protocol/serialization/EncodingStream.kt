@@ -6,6 +6,8 @@ import protocol.serialization.EncodingStrategy
 interface EncodingStream {
   val json: Json
 
+  fun encodeByte(value: Byte)
+
   fun encodeBoolean(value: Boolean)
 
   fun encodeString(value: String)

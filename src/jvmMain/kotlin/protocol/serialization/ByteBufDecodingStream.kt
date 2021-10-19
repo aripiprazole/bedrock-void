@@ -32,7 +32,7 @@ class ByteBufDecodingStream(
   override fun decodeUByte(): UByte = buf.readUnsignedByte().toUByte()
 
   override fun decodeString(): String {
-    return ByteArray(decodeInt())
+    return ByteArray(decodeVarInt())
       .also(buf::readBytes)
       .decodeToString()
   }

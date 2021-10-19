@@ -12,6 +12,10 @@ class ByteBufEncodingStream(
   private val codec: EncodingCodec,
   override val json: Json,
 ) : EncodingStream {
+  override fun encodeByte(value: Byte) {
+    buf.writeByte(value.toInt())
+  }
+
   override fun encodeBoolean(value: Boolean) {
     buf.writeBoolean(value)
   }

@@ -7,6 +7,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.MinecraftServer
 import com.gabrielleeg1.bedrockvoid.protocol.MinecraftSession
 import com.gabrielleeg1.bedrockvoid.protocol.packets.InboundPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.any.AnimatePacket
+import com.gabrielleeg1.bedrockvoid.protocol.packets.any.ChatPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.any.InteractPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.any.MovePlayerPacket
 import com.gabrielleeg1.bedrockvoid.protocol.packets.any.TickSyncPacket
@@ -27,6 +28,7 @@ import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.ResourcePacksStack
 import com.gabrielleeg1.bedrockvoid.protocol.packets.outbound.StartGamePacket
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.EncodingCodec
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.AnimatePacketEncoder
+import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.ChatPacketEncoder
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.InteractPacketEncoder
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.MovePlayerPacketEncoder
 import com.gabrielleeg1.bedrockvoid.protocol.serialization.packets.any.TickSyncPacketEncoder
@@ -78,6 +80,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -93,7 +96,7 @@ import java.util.concurrent.Executors
 import kotlin.random.Random
 import kotlin.random.nextULong
 
-typealias MinecraftStateFlow = MutableStateFlow<MinecraftPlayer>
+typealias PlayerStateFlow = MutableStateFlow<MinecraftPlayer>
 
 private val logger = KotlinLogging.logger { }
 
@@ -106,34 +109,48 @@ private val ctx = SupervisorJob() +
 
 private val scope = CoroutineScope(ctx)
 
+class BedrockServer(
+  val onlinePlayers: MutableSet<MinecraftPlayer> = HashSet(),
+)
+
 @ExperimentalStdlibApi
 suspend fun main(): Unit = withContext(ctx) {
   logger.info { "Creating server..." }
 
+  val bedrockServer = BedrockServer()
+
   val address = InetSocketAddress("0.0.0.0", 19132)
-  val server = MinecraftServer(address, motd, codec, ::onSessionCreated)
+  val server = MinecraftServer(
+    address, motd, codec,
+    bedrockServer::onSessionCreated,
+  )
 
   server.bind()
 }
 
 @Suppress("UNCHECKED_CAST")
-fun onSessionCreated(session: MinecraftSession) {
-  val player = MutableStateFlow<MinecraftPlayer?>(null)
+fun BedrockServer.onSessionCreated(session: MinecraftSession) {
+  val playerState = MutableStateFlow<MinecraftPlayer?>(null)
 
-  val loginJob = handleLogin(session, player).launchIn(scope)
-  val resourcePackJob = handleResourcePack(session, player as MinecraftStateFlow).launchIn(scope)
-  val joinGameJob = handleJoinGamePackets(session, player as MinecraftStateFlow).launchIn(scope)
+  val loginJob = handleLogin(session, playerState).launchIn(scope)
+  val resourcePackJob = handleResourcePack(session, playerState as PlayerStateFlow).launchIn(scope)
+  val joinGameJob = handleJoinGamePackets(session, playerState as PlayerStateFlow).launchIn(scope)
 
-  player
+  playerState
     .filterNotNull()
-    .onEach { (username, address, version, state) ->
+    .onEach { player ->
+      val (username, address, version, state) = player
       when (state) {
         PlayerState.Connected -> loginJob.cancelAndJoin()
         PlayerState.Joining -> resourcePackJob.cancelAndJoin()
         PlayerState.InGame -> {
+          joinGameJob.cancelAndJoin()
+
+          onlinePlayers.add(player)
+
           logger.info { "Player $username joined with protocol [$version] connected from [$address]" }
 
-          joinGameJob.cancelAndJoin()
+          handleGamePackets(player).collect()
         }
       }
     }
@@ -174,7 +191,7 @@ fun handleLogin(
 
 fun handleResourcePack(
   session: MinecraftSession,
-  player: MinecraftStateFlow,
+  player: PlayerStateFlow,
 ): Flow<ResourcePackResponsePacket> = session.inboundPacketFlow
   .filterIsInstance<ResourcePackResponsePacket>()
   .onEach { packet ->
@@ -198,7 +215,7 @@ fun handleResourcePack(
 
 fun handleJoinGamePackets(
   session: MinecraftSession,
-  player: MinecraftStateFlow,
+  player: PlayerStateFlow,
 ): Flow<InboundPacket> = session.inboundPacketFlow.onEach { packet ->
   when (packet) {
     is RequestChunkRadiusPacket -> {
@@ -214,10 +231,11 @@ fun handleJoinGamePackets(
   }
 }
 
-fun handleGamePackets(player: MinecraftPlayer): Flow<InboundPacket> =
+fun BedrockServer.handleGamePackets(player: MinecraftPlayer): Flow<InboundPacket> =
   player.session.inboundPacketFlow.onEach { packet ->
     when (packet) {
       is RequestChunkRadiusPacket -> player.sendPackets(ChunkRadiusUpdatedPacket(packet.chunkRadius))
+      is ChatPacket -> onlinePlayers.forEach { it.sendPackets(packet) }
       is TickSyncPacket -> {
       }
     }
@@ -266,6 +284,7 @@ private val codec = EncodingCodec(
     put(EducationSharedResourceUri::class, EducationSharedResourceUriEncoder)
     put(BlockPos::class, BlockPosEncoder)
     put(BehaviorPack::class, BehaviorPackEncoder)
+    put(ChatPacket::class, ChatPacketEncoder)
   },
 )
 
