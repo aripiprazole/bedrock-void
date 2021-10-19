@@ -65,7 +65,7 @@ class MinecraftSession(
   }
 
   suspend fun sendPackets(packets: List<OutboundPacket>) {
-    val uncompressed = ByteBufAllocator.DEFAULT.buffer(1 shl 3) // (packet list size) << 3
+    val uncompressed = ByteBufAllocator.DEFAULT.buffer(packets.size shl 3) // (packet list size) << 3
 
     packets.forEach { packet ->
       val id = getPacketId(packet::class)
